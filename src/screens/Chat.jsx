@@ -44,7 +44,7 @@ export default function Chat() {
 
             <div className='bg-stone-950 h-[80vh]'>
                {Chatlist.map((item , index) => (
-                 <div key={index} className='cursor-pointer hover:bg-stone-950 w-11/ border border-black shadow-stone-900 shadow-md rounded-lg mx-auto py-7 px-10 bg-stone-900  text-orange-400 flex justify-between'>
+                 <div key={index} className='cursor-pointer hover:bg-stone-950 w-11/ border border-black rounded-lg mx-auto py-7 px-10 bg-stone-900  text-orange-400 flex justify-between'>
                  <div className='flex items-center'>
                     <h1 className='text-lg text- font-bold'>{item.message}</h1>
                  </div>
