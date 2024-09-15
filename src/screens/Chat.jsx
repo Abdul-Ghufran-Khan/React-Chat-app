@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import moment from "moment";
 import { db } from '../database/firebase.cnfig';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { addDoc, collection, query, where, onSnapshot } from "firebase/firestore";
@@ -11,16 +12,16 @@ export default function Chat() {
 
 
     useEffect(() => {
-            const q = query(collection(db, "chat"), where(state.uid, "==", true), where(state.Myuid, "==", true));
-            const unsubscribe = onSnapshot(q, (docSnap) => {
-                const list = [];
-                docSnap.forEach((doc) => {
-                    list.push(doc.data());
-                });
-                setchatlist(list);
-                console.log(Chatlist); 
+        const q = query(collection(db, "chat"), where(state.uid, "==", true), where(state.Myuid, "==", true));
+        const unsubscribe = onSnapshot(q, (docSnap) => {
+            const list = [];
+            docSnap.forEach((doc) => {
+                list.push(doc.data());
             });
-            return  () => unsubscribe();
+            const sortlist = list.sort((a, b) => a.createdAt - b.createdAt)
+            setchatlist(sortlist);
+        });
+        return () => unsubscribe();
     }, [])
 
     const sendMsg = async () => {
@@ -28,6 +29,7 @@ export default function Chat() {
             message,
             [state.Myuid]: true,
             [state.uid]: true,
+            senderuid: state.Myuid,
             createdAt: Date.now()
         })
         setMessage('')
@@ -43,13 +45,14 @@ export default function Chat() {
             </div>
 
             <div className='bg-stone-950 h-[80vh]'>
-               {Chatlist.map((item , index) => (
-                 <div key={index} className='cursor-pointer hover:bg-stone-950 w-11/ border border-black rounded-lg mx-auto py-7 px-10 bg-stone-900  text-orange-400 flex justify-between'>
-                 <div className='flex items-center'>
-                    <h1 className='text-lg text- font-bold'>{item.message}</h1>
-                 </div>
-             </div>
-               ))}
+                {Chatlist.map((item, index) => (
+                    <div key={index} className={`w-full flex px-10 ${item.senderuid == state.Myuid ? "justify-end" : "justify-start"}`}>
+                        <div className='border-black rounded-lg mt-2 py-4 px-10 bg-stone-900  text-orange-400 '>
+                        <h1 className='text-lg font-semibold'>{item.message}</h1>
+                        <h1 className='text-sm text-orange-300'>{moment(item.createdAt).startOf('seconds').fromNow()}</h1>
+                        </div>
+                    </div>
+                ))}
             </div>
 
             <div className='flex items-center justify-center pt-1 gap-2'>
